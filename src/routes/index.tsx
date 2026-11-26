@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Download, Leaf, Maximize, Minus, Plus, Recycle, X } from "lucide-react";
+import { Download, Leaf, Maximize, Minus, Play, Plus, Recycle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import infographic from "@/assets/guia-ecologica.png.asset.json";
 import banner from "@/assets/banner-recoleccion.png.asset.json";
-import { DOWNLOAD_URL, clampZoom } from "@/lib/ecoregistro";
+import { DOWNLOAD_URL, LAUNCH_URL, clampZoom } from "@/lib/ecoregistro";
 
 const SITE_ORIGIN = "https://prompt-shaped-webpage.lovable.app";
 const BANNER_URL = `${SITE_ORIGIN}${banner.url}`;
@@ -94,6 +94,14 @@ function Index() {
               Descargar EcoRegistro para Windows (.zip)
             </a>
           </Button>
+          <div className="mt-4">
+            <Button asChild variant="outline" className="h-auto max-w-full gap-3 whitespace-normal px-6 py-4 text-base font-bold">
+              <a href={LAUNCH_URL}>
+                <Play aria-hidden="true" />
+                Abrir EcoRegistro (equipos configurados)
+              </a>
+            </Button>
+          </div>
         </section>
 
         <footer className="border-t border-accent/50 bg-primary px-6 py-10 text-center text-primary-foreground">
