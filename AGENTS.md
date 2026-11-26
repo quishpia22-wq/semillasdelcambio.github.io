@@ -28,3 +28,6 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- Keep the infographic viewer client-side using a native dialog and optional Fullscreen API, so blocked fullscreen still offers an accessible full-window view.
+- Keep local executable paths in a browser-safe shared module; browsers may block file URLs, so always offer a manual copy fallback.
