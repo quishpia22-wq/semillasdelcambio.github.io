@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Download, Leaf, Maximize, Minus, Play, Plus, Recycle, X } from "lucide-react";
+import { Download, FileText, GlassWater, Leaf, Maximize, Minus, Package, Play, Plus, Recycle, Scale, Sprout, Trash2, UtensilsCrossed, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import infographic from "@/assets/guia-ecologica.png.asset.json";
 import banner from "@/assets/banner-recoleccion.png.asset.json";
@@ -10,6 +10,25 @@ const SITE_ORIGIN = "https://prompt-shaped-webpage.lovable.app";
 const BANNER_URL = `${SITE_ORIGIN}${banner.url}`;
 const INFOGRAPHIC_URL = `${SITE_ORIGIN}${infographic.url}`;
 const MATERIALS = ["Plástico", "Papel", "Cartón", "Vidrio", "Metal"];
+const NAV = [
+  { href: "#inicio", label: "Inicio" },
+  { href: "#materiales", label: "Materiales" },
+  { href: "#pasos", label: "Cómo participar" },
+  { href: "#infografia", label: "Infografía" },
+  { href: "#descarga", label: "Descarga" },
+];
+const MATERIAL_CARDS = [
+  { name: "Plástico", icon: Recycle, tip: "Botellas y envases limpios y aplastados." },
+  { name: "Papel", icon: FileText, tip: "Hojas, cuadernos y periódicos secos." },
+  { name: "Cartón", icon: Package, tip: "Cajas desarmadas y sin restos de comida." },
+  { name: "Vidrio", icon: GlassWater, tip: "Frascos y botellas enteros, sin tapa." },
+  { name: "Metal", icon: UtensilsCrossed, tip: "Latas enjuagadas y comprimidas." },
+];
+const STEPS = [
+  { icon: Trash2, title: "Separa", text: "Clasifica tus residuos por tipo de material." },
+  { icon: Scale, title: "Registra", text: "Anota tu aporte en el programa EcoRegistro." },
+  { icon: Sprout, title: "Transforma", text: "Tu material vuelve a ser recurso para el planeta." },
+];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -48,7 +67,7 @@ function Index() {
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground">
-      <header className="border-b border-border bg-background">
+      <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur-sm">
         <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-6 sm:px-10">
           <div className="relative flex size-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground" aria-hidden="true">
             <Recycle className="size-10" strokeWidth={1.3} />
@@ -59,10 +78,17 @@ function Index() {
             <p className="mt-1 text-sm text-foreground">Soporte técnico y cuidado ambiental</p>
           </div>
         </div>
+        <nav aria-label="Secciones" className="border-t border-border">
+          <ul className="mx-auto flex max-w-6xl gap-1 overflow-x-auto px-4 py-2 sm:px-8">
+            {NAV.map((item) => (
+              <li key={item.href} className="shrink-0"><a href={item.href} className="nav-pill">{item.label}</a></li>
+            ))}
+          </ul>
+        </nav>
       </header>
 
       <main>
-        <section aria-label="Recolección de material reciclable" className="eco-banner relative isolate overflow-hidden border-b border-border">
+        <section id="inicio" aria-label="Recolección de material reciclable" className="eco-banner scroll-section relative isolate overflow-hidden border-b border-border">
           <img src={BANNER_URL} width={1536} height={1024} alt="Ilustración de contenedores de recolección con botellas de plástico, papel, cartón, frascos de vidrio y latas de metal, y unas manos depositando una botella" className="banner-art" fetchPriority="high" />
           <div className="relative mx-auto flex min-h-[21rem] max-w-6xl items-center px-6 py-10 sm:min-h-[27rem] sm:px-10">
             <div className="max-w-md rounded-xl bg-card/95 p-6 backdrop-blur-[2px] sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
@@ -78,14 +104,48 @@ function Index() {
           </div>
         </section>
 
-        <section aria-label="Infografía" className="w-full">
+        <section id="materiales" aria-labelledby="materiales-titulo" className="scroll-section mx-auto max-w-6xl px-6 py-16 sm:px-10">
+          <SectionHeading number="01" id="materiales-titulo" title="Materiales que recolectamos" />
+          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {MATERIAL_CARDS.map(({ name, icon: Icon, tip }, index) => (
+              <li key={name} className="material-card reveal" style={{ animationDelay: `${index * 90}ms` }}>
+                <span className="material-icon"><Icon className="size-7" strokeWidth={1.6} aria-hidden="true" /></span>
+                <h3 className="mt-4 text-lg font-extrabold text-primary">{name}</h3>
+                <p className="mt-2 text-sm leading-relaxed">{tip}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <section id="pasos" aria-labelledby="pasos-titulo" className="scroll-section bg-card py-16">
+          <div className="mx-auto max-w-6xl px-6 sm:px-10">
+            <SectionHeading number="02" id="pasos-titulo" title="Cómo participar" />
+            <ol className="mt-10 grid gap-6 md:grid-cols-3">
+              {STEPS.map(({ icon: Icon, title, text }, index) => (
+                <li key={title} className="step-card reveal" style={{ animationDelay: `${index * 120}ms` }}>
+                  <span className="step-number">{index + 1}</span>
+                  <Icon className="size-8 text-accent" strokeWidth={1.6} aria-hidden="true" />
+                  <h3 className="mt-3 text-xl font-extrabold text-primary">{title}</h3>
+                  <p className="mt-2 leading-relaxed">{text}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section id="infografia" aria-labelledby="infografia-titulo" className="scroll-section w-full pt-16">
+          <div className="mx-auto max-w-6xl px-6 pb-8 sm:px-10">
+            <SectionHeading number="03" id="infografia-titulo" title="Guía de soporte técnico" />
+          </div>
           <div className="flex justify-end border-y border-border bg-card px-6 py-3 sm:px-10">
             <Button variant="outline" onClick={openViewer}><Maximize aria-hidden="true" />Pantalla completa</Button>
           </div>
           <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="EcoRegistro soporte técnico: partes del gabinete y sus funciones, importancia de la ventilación, riesgos identificados y recomendaciones preventivas para cuidar tu computadora." className="block h-auto w-full" fetchPriority="high" />
         </section>
 
-        <section aria-label="Acceso a EcoRegistro en Visual Basic" className="eco-access px-6 py-14 text-center sm:py-16">
+        <section id="descarga" aria-label="Acceso a EcoRegistro en Visual Basic" className="scroll-section eco-access px-6 py-14 text-center sm:py-16">
+          <p className="mb-2 text-sm font-extrabold tracking-[0.2em] text-accent">04</p>
+          <h2 className="mb-6 text-3xl font-extrabold text-primary">Descarga EcoRegistro</h2>
           <Leaf className="mx-auto mb-6 size-9 text-primary" strokeWidth={1.3} aria-hidden="true" />
           <p className="mx-auto mb-7 max-w-xl text-base leading-relaxed">¿Listo para registrar tus aportes de material reciclable? Descarga el programa EcoRegistro para Windows, extrae el archivo ZIP y abre EcoRegistro.exe.</p>
           <Button asChild className="h-auto max-w-full gap-3 whitespace-normal px-6 py-5 text-base font-bold shadow-soft hover:bg-accent sm:text-lg">
@@ -126,6 +186,15 @@ function Index() {
           </div>
         </div>
       </dialog>
+    </div>
+  );
+}
+
+function SectionHeading({ number, id, title }: { number: string; id: string; title: string }) {
+  return (
+    <div className="flex items-end gap-4">
+      <span className="text-5xl leading-none font-extrabold text-accent/80">{number}</span>
+      <h2 id={id} className="border-b-4 border-accent pb-1 text-3xl font-extrabold text-primary">{title}</h2>
     </div>
   );
 }
