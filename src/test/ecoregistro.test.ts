@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { EXECUTABLE_PATH, EXECUTABLE_URL, clampZoom } from "@/lib/ecoregistro";
+import { DOWNLOAD_URL, clampZoom } from "@/lib/ecoregistro";
 
 describe("Acceso al ejecutable", () => {
-  it("mantiene la ruta local exacta solicitada", () => {
-    expect(EXECUTABLE_URL).toBe("file:///C:/Users/PC_S/OneDrive/Documents/Pictures/Desktop/ECOREGISTRO/EcoRegistro.exe");
-    expect(EXECUTABLE_PATH).toBe(String.raw`C:\Users\PC_S\OneDrive\Documents\Pictures\Desktop\ECOREGISTRO\EcoRegistro.exe`);
+  it("descarga el programa desde el propio sitio", () => {
+    expect(DOWNLOAD_URL).toBe("/descargas/EcoRegistro.zip");
   });
   it("limita el zoom a una escala legible", () => {
     expect(clampZoom(0.5)).toBe(1);

@@ -1,13 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { Copy, ExternalLink, Leaf, Maximize, Minus, Plus, Recycle, X } from "lucide-react";
+import { Download, Leaf, Maximize, Minus, Plus, Recycle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import infographic from "@/assets/guia-ecologica.png.asset.json";
 import banner from "@/assets/banner-recoleccion.png.asset.json";
-import { EXECUTABLE_PATH, EXECUTABLE_URL, clampZoom } from "@/lib/ecoregistro";
+import { DOWNLOAD_URL, clampZoom } from "@/lib/ecoregistro";
 
 const SITE_ORIGIN = "https://prompt-shaped-webpage.lovable.app";
 const BANNER_URL = `${SITE_ORIGIN}${banner.url}`;
+const INFOGRAPHIC_URL = `${SITE_ORIGIN}${infographic.url}`;
 const MATERIALS = ["Plástico", "Papel", "Cartón", "Vidrio", "Metal"];
 
 export const Route = createFileRoute("/")({
@@ -28,21 +29,7 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const dialog = useRef<HTMLDialogElement>(null);
-  const pathInput = useRef<HTMLInputElement>(null);
-  const [notice, setNotice] = useState(false);
-  const [copyStatus, setCopyStatus] = useState("");
   const [zoom, setZoom] = useState(1);
-
-  async function copyPath() {
-    try {
-      await navigator.clipboard.writeText(EXECUTABLE_PATH);
-      setCopyStatus("Ruta copiada.");
-    } catch {
-      pathInput.current?.focus();
-      pathInput.current?.select();
-      setCopyStatus("No se pudo copiar automáticamente. Selecciona y copia la ruta mostrada.");
-    }
-  }
 
   function openViewer() {
     const element = dialog.current;
@@ -76,7 +63,7 @@ function Index() {
 
       <main>
         <section aria-label="Recolección de material reciclable" className="eco-banner relative isolate overflow-hidden border-b border-border">
-          <img src={banner.url} width={1536} height={1024} alt="Ilustración de contenedores de recolección con botellas de plástico, papel, cartón, frascos de vidrio y latas de metal, y unas manos depositando una botella" className="banner-art" fetchPriority="high" />
+          <img src={BANNER_URL} width={1536} height={1024} alt="Ilustración de contenedores de recolección con botellas de plástico, papel, cartón, frascos de vidrio y latas de metal, y unas manos depositando una botella" className="banner-art" fetchPriority="high" />
           <div className="relative mx-auto flex min-h-[21rem] max-w-6xl items-center px-6 py-10 sm:min-h-[27rem] sm:px-10">
             <div className="max-w-md rounded-xl bg-card/95 p-6 backdrop-blur-[2px] sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
               <p className="text-xs font-extrabold tracking-[0.18em] text-accent uppercase">Recolección de material reciclable</p>
@@ -95,28 +82,18 @@ function Index() {
           <div className="flex justify-end border-y border-border bg-card px-6 py-3 sm:px-10">
             <Button variant="outline" onClick={openViewer}><Maximize aria-hidden="true" />Pantalla completa</Button>
           </div>
-          <img src={infographic.url} width={1024} height={1536} alt="EcoRegistro soporte técnico: partes del gabinete y sus funciones, importancia de la ventilación, riesgos identificados y recomendaciones preventivas para cuidar tu computadora." className="block h-auto w-full" fetchPriority="high" />
+          <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="EcoRegistro soporte técnico: partes del gabinete y sus funciones, importancia de la ventilación, riesgos identificados y recomendaciones preventivas para cuidar tu computadora." className="block h-auto w-full" fetchPriority="high" />
         </section>
 
         <section aria-label="Acceso a EcoRegistro en Visual Basic" className="eco-access px-6 py-14 text-center sm:py-16">
           <Leaf className="mx-auto mb-6 size-9 text-primary" strokeWidth={1.3} aria-hidden="true" />
-          <p className="mx-auto mb-7 max-w-xl text-base leading-relaxed">¿Listo para registrar tus aportes de material reciclable? Abre el programa de EcoRegistro en Visual Basic.</p>
+          <p className="mx-auto mb-7 max-w-xl text-base leading-relaxed">¿Listo para registrar tus aportes de material reciclable? Descarga el programa EcoRegistro para Windows, extrae el archivo ZIP y abre EcoRegistro.exe.</p>
           <Button asChild className="h-auto max-w-full gap-3 whitespace-normal px-6 py-5 text-base font-bold shadow-soft hover:bg-accent sm:text-lg">
-            <a href={EXECUTABLE_URL} onClick={() => setNotice(true)}>
-              <ExternalLink aria-hidden="true" />
-              Abrir EcoRegistro en Visual Basic (.exe)
+            <a href={DOWNLOAD_URL} download>
+              <Download aria-hidden="true" />
+              Descargar EcoRegistro para Windows (.zip)
             </a>
           </Button>
-          {notice && (
-            <div className="mx-auto mt-7 max-w-2xl rounded-lg border border-border bg-card p-5 text-left" role="status">
-              <p className="text-sm leading-relaxed">El navegador puede bloquear la apertura de archivos locales. Si EcoRegistro no se abre, copia esta ruta y pégala en el Explorador de archivos de Windows.</p>
-              <input ref={pathInput} aria-label="Ruta del programa EcoRegistro" readOnly value={EXECUTABLE_PATH} className="mt-4 w-full rounded-md border border-input bg-background p-3 font-mono text-xs" />
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-                <Button variant="outline" onClick={copyPath}><Copy aria-hidden="true" />Copiar ruta</Button>
-                <p className="text-sm text-primary">{copyStatus}</p>
-              </div>
-            </div>
-          )}
         </section>
 
         <footer className="border-t border-accent/50 bg-primary px-6 py-10 text-center text-primary-foreground">
@@ -137,7 +114,7 @@ function Index() {
             </div>
           </div>
           <div className="min-h-0 flex-1 overflow-auto overscroll-contain">
-            <img src={infographic.url} width={1024} height={1536} alt="Infografía EcoRegistro ampliada" className="viewer-image" style={{ width: `${zoom * 100}%` }} />
+            <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="Infografía EcoRegistro ampliada" className="viewer-image" style={{ width: `${zoom * 100}%` }} />
           </div>
         </div>
       </dialog>

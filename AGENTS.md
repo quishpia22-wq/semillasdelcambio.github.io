@@ -30,4 +30,4 @@ use the editor.
 <!-- LOVABLE:END -->
 
 - Keep the infographic viewer client-side using a native dialog and optional Fullscreen API, so blocked fullscreen still offers an accessible full-window view.
-- Keep local executable paths in a browser-safe shared module; browsers may block file URLs, so always offer a manual copy fallback.
+- Distribute the Windows program as a download from `public/descargas/EcoRegistro.zip`; web pages cannot open files on a visitor's computer.
