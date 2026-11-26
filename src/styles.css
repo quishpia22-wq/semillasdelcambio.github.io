@@ -162,6 +162,19 @@
   background: linear-gradient(180deg, var(--background), var(--card));
 }
 
+.eco-banner {
+  background: var(--background);
+}
+
+.banner-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 78% center;
+}
+
 .infographic-dialog {
   position: fixed;
   inset: 0;

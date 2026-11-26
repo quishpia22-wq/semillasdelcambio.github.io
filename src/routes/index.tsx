@@ -3,17 +3,24 @@ import { useRef, useState } from "react";
 import { Copy, ExternalLink, Leaf, Maximize, Minus, Plus, Recycle, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import infographic from "@/assets/guia-ecologica.png.asset.json";
+import banner from "@/assets/banner-recoleccion.png.asset.json";
 import { EXECUTABLE_PATH, EXECUTABLE_URL, clampZoom } from "@/lib/ecoregistro";
+
+const SITE_ORIGIN = "https://prompt-shaped-webpage.lovable.app";
+const BANNER_URL = `${SITE_ORIGIN}${banner.url}`;
+const MATERIALS = ["Plástico", "Papel", "Cartón", "Vidrio", "Metal"];
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "EcoRegistro — Soporte técnico y cuidado ambiental" },
-      { name: "description", content: "EcoRegistro: soporte técnico, cuidado y prevención de riesgos en el gabinete de computadora." },
-      { property: "og:title", content: "EcoRegistro — Soporte técnico y cuidado ambiental" },
-      { property: "og:description", content: "Identificación, cuidado y prevención de riesgos en el gabinete de computadora." },
+      { title: "EcoRegistro — Recolección de material reciclable" },
+      { name: "description", content: "EcoRegistro: recolección y registro de material reciclable, soporte técnico y cuidado ambiental." },
+      { property: "og:title", content: "EcoRegistro — Recolección de material reciclable" },
+      { property: "og:description", content: "Plástico, papel, cartón, vidrio y metal: registra tus aportes y cuida tu computadora." },
       { property: "og:type", content: "website" },
+      { property: "og:image", content: BANNER_URL },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: BANNER_URL },
     ],
   }),
   component: Index,
@@ -68,8 +75,32 @@ function Index() {
       </header>
 
       <main>
-        <section aria-label="Acceso a EcoRegistro en Visual Basic" className="eco-access px-6 py-16 text-center sm:py-20">
-          <Leaf className="mx-auto mb-7 size-9 text-primary" strokeWidth={1.3} aria-hidden="true" />
+        <section aria-label="Recolección de material reciclable" className="eco-banner relative isolate overflow-hidden border-b border-border">
+          <img src={banner.url} width={1536} height={1024} alt="Ilustración de contenedores de recolección con botellas de plástico, papel, cartón, frascos de vidrio y latas de metal, y unas manos depositando una botella" className="banner-art" fetchPriority="high" />
+          <div className="relative mx-auto flex min-h-[21rem] max-w-6xl items-center px-6 py-10 sm:min-h-[27rem] sm:px-10">
+            <div className="max-w-md rounded-xl bg-card/95 p-6 backdrop-blur-[2px] sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+              <p className="text-xs font-extrabold tracking-[0.18em] text-accent uppercase">Recolección de material reciclable</p>
+              <h2 className="mt-3 text-3xl leading-tight font-extrabold text-primary sm:text-4xl">Separamos hoy lo que mañana vuelve a servir</h2>
+              <p className="mt-4 text-base leading-relaxed">Plástico, papel, cartón, vidrio y metal: cada aporte que registras en EcoRegistro deja de ser basura y se convierte en recurso para el planeta.</p>
+              <ul className="mt-5 flex flex-wrap gap-2">
+                {MATERIALS.map((material) => (
+                  <li key={material} className="rounded-full border border-border bg-background px-3 py-1 text-sm font-semibold text-primary">{material}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section aria-label="Infografía" className="w-full">
+          <div className="flex justify-end border-y border-border bg-card px-6 py-3 sm:px-10">
+            <Button variant="outline" onClick={openViewer}><Maximize aria-hidden="true" />Pantalla completa</Button>
+          </div>
+          <img src={infographic.url} width={1024} height={1536} alt="EcoRegistro soporte técnico: partes del gabinete y sus funciones, importancia de la ventilación, riesgos identificados y recomendaciones preventivas para cuidar tu computadora." className="block h-auto w-full" fetchPriority="high" />
+        </section>
+
+        <section aria-label="Acceso a EcoRegistro en Visual Basic" className="eco-access px-6 py-14 text-center sm:py-16">
+          <Leaf className="mx-auto mb-6 size-9 text-primary" strokeWidth={1.3} aria-hidden="true" />
+          <p className="mx-auto mb-7 max-w-xl text-base leading-relaxed">¿Listo para registrar tus aportes de material reciclable? Abre el programa de EcoRegistro en Visual Basic.</p>
           <Button asChild className="h-auto max-w-full gap-3 whitespace-normal px-6 py-5 text-base font-bold shadow-soft hover:bg-accent sm:text-lg">
             <a href={EXECUTABLE_URL} onClick={() => setNotice(true)}>
               <ExternalLink aria-hidden="true" />
@@ -88,16 +119,10 @@ function Index() {
           )}
         </section>
 
-        <section aria-label="Infografía y pie de página" className="w-full">
-          <div className="flex justify-end border-y border-border bg-card px-6 py-3 sm:px-10">
-            <Button variant="outline" onClick={openViewer}><Maximize aria-hidden="true" />Pantalla completa</Button>
-          </div>
-          <img src={infographic.url} width={1024} height={1536} alt="EcoRegistro soporte técnico: partes del gabinete y sus funciones, importancia de la ventilación, riesgos identificados y recomendaciones preventivas para cuidar tu computadora." className="block h-auto w-full" fetchPriority="high" />
-          <footer className="border-t border-accent/50 bg-primary px-6 py-10 text-center text-primary-foreground">
-            <p className="text-lg font-bold">“Pequeños hábitos, grandes cambios”</p>
-            <p className="mt-1 text-sm opacity-90">EcoRegistro · Semillas del Cambio · 3.º BTI</p>
-          </footer>
-        </section>
+        <footer className="border-t border-accent/50 bg-primary px-6 py-10 text-center text-primary-foreground">
+          <p className="text-lg font-bold">“Pequeños hábitos, grandes cambios”</p>
+          <p className="mt-1 text-sm opacity-90">EcoRegistro · Semillas del Cambio · 3.º BTI</p>
+        </footer>
       </main>
 
       <dialog ref={dialog} aria-label="Infografía en pantalla completa" className="infographic-dialog" onCancel={(event) => { event.preventDefault(); void closeViewer(); }}>
