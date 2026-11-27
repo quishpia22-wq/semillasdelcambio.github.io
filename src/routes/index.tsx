@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { Download, FileText, GlassWater, Leaf, Maximize, Minus, Package, Play, Plus, Recycle, Scale, Sprout, Trash2, UtensilsCrossed, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import infographic from "@/assets/guia-ecologica.png.asset.json";
 import banner from "@/assets/banner-recoleccion.png.asset.json";
+import { useInView } from "@/hooks/use-in-view";
+import { cn } from "@/lib/utils";
 import { DOWNLOAD_URL, LAUNCH_URL, clampZoom } from "@/lib/ecoregistro";
 
 const SITE_ORIGIN = "https://prompt-shaped-webpage.lovable.app";
@@ -29,6 +31,11 @@ const STEPS = [
   { icon: Scale, title: "Registra", text: "Anota tu aporte en el programa EcoRegistro." },
   { icon: Sprout, title: "Transforma", text: "Tu material vuelve a ser recurso para el planeta." },
 ];
+const SUPPORT_CROPS = [
+  { label: "El gabinete", position: "center 6%" },
+  { label: "Ventilación", position: "center 42%" },
+  { label: "Prevención", position: "center 94%" },
+];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -49,6 +56,7 @@ export const Route = createFileRoute("/")({
 function Index() {
   const dialog = useRef<HTMLDialogElement>(null);
   const [zoom, setZoom] = useState(1);
+  const support = useInView<HTMLDivElement>();
 
   function openViewer() {
     const element = dialog.current;
@@ -133,14 +141,32 @@ function Index() {
           </div>
         </section>
 
-        <section id="infografia" aria-labelledby="infografia-titulo" className="scroll-section w-full pt-16">
-          <div className="mx-auto max-w-6xl px-6 pb-8 sm:px-10">
+        <section id="infografia" aria-labelledby="infografia-titulo" className="scroll-section relative isolate overflow-hidden border-y border-border bg-card py-14">
+          <Leaf className="drift-leaf" strokeWidth={1.3} aria-hidden="true" />
+          <Recycle className="drift-recycle" strokeWidth={1.3} aria-hidden="true" />
+          <div className="relative mx-auto max-w-6xl px-6 sm:px-10">
             <SectionHeading number="03" id="infografia-titulo" title="Guía de soporte técnico" />
+            <p className="mt-3 max-w-md text-sm leading-relaxed">Tres vistazos a la guía. Toca la tarjeta que quieras para abrirla completa y leerla con calma.</p>
           </div>
-          <div className="flex justify-end border-y border-border bg-card px-6 py-3 sm:px-10">
-            <Button variant="outline" onClick={openViewer}><Maximize aria-hidden="true" />Pantalla completa</Button>
+
+          <div ref={support.ref} className={cn("support-deck", support.inView && "is-visible")}>
+            <span className="deck-glow" aria-hidden="true" />
+            <button type="button" onClick={openViewer} className="deck-cards" aria-label="Abrir la guía de soporte técnico en pantalla completa">
+              <span className="sr-only">EcoRegistro soporte técnico: partes del gabinete y sus funciones, importancia de la ventilación, riesgos identificados y recomendaciones preventivas para cuidar tu computadora.</span>
+              {SUPPORT_CROPS.map((crop, index) => (
+                <span key={crop.label} className="deck-card" style={{ "--i": index, "--crop": crop.position } as CSSProperties}>
+                  <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="" loading="lazy" className="deck-img" />
+                  <span className="deck-shine" aria-hidden="true" />
+                  <span className="deck-tag">{crop.label}</span>
+                </span>
+              ))}
+            </button>
           </div>
-          <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="EcoRegistro soporte técnico: partes del gabinete y sus funciones, importancia de la ventilación, riesgos identificados y recomendaciones preventivas para cuidar tu computadora." className="block h-auto w-full" fetchPriority="high" />
+
+          <div className="relative mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 px-6 pt-8 sm:px-10">
+            <Button onClick={openViewer} className="gap-2"><Maximize aria-hidden="true" />Abrir en pantalla completa</Button>
+            <span className="text-xs font-semibold text-muted-foreground">Dentro del visor puedes acercar con + y −</span>
+          </div>
         </section>
 
         <section id="descarga" aria-label="Acceso a EcoRegistro en Visual Basic" className="scroll-section eco-access px-6 py-14 text-center sm:py-16">
