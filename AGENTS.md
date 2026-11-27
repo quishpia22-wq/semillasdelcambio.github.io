@@ -31,3 +31,5 @@ use the editor.
 
 - Keep the infographic viewer client-side using a native dialog and optional Fullscreen API, so blocked fullscreen still offers an accessible full-window view.
 - Distribute the Windows program as a download from `public/descargas/EcoRegistro.zip`; web pages cannot open files on a visitor's computer.
+- Lazy-load the recycling R3F scene behind ClientOnly; keep the rest of the page server-rendered and pause automatic motion offscreen or for reduced-motion preferences.
+- Use react-zoom-pan-pinch inside the native support dialog for image inspection; the supplied infographic is a 2D image, not a rotatable CPU model.

@@ -1,12 +1,24 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useRef, useState, type CSSProperties } from "react";
-import { Download, FileText, GlassWater, Leaf, Maximize, Minus, Package, Play, Plus, Recycle, Scale, Sprout, Trash2, UtensilsCrossed, X } from "lucide-react";
+import { ClientOnly, createFileRoute } from "@tanstack/react-router";
+import { lazy, Suspense, useRef, useState, type PointerEvent } from "react";
+import { Cpu, Download, FileText, GlassWater, Leaf, Maximize, Package, Pause, Play, Recycle, Scale, Sprout, Trash2, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import infographic from "@/assets/guia-ecologica.png.asset.json";
 import banner from "@/assets/banner-recoleccion.png.asset.json";
-import { useInView } from "@/hooks/use-in-view";
-import { cn } from "@/lib/utils";
-import { DOWNLOAD_URL, LAUNCH_URL, clampZoom } from "@/lib/ecoregistro";
+import { SupportImageViewer } from "@/components/support-image-viewer";
+import { DOWNLOAD_URL, LAUNCH_URL } from "@/lib/ecoregistro";
+
+const EcoScene = lazy(() => import("@/components/eco-scene"));
+
+function tilt(event: PointerEvent<HTMLElement>) {
+  if (event.pointerType !== "mouse") return;
+  const bounds = event.currentTarget.getBoundingClientRect();
+  event.currentTarget.style.setProperty("--tilt-x", `${-(event.clientY - bounds.top - bounds.height / 2) / bounds.height * 16}deg`);
+  event.currentTarget.style.setProperty("--tilt-y", `${(event.clientX - bounds.left - bounds.width / 2) / bounds.width * 16}deg`);
+}
+function resetTilt(event: PointerEvent<HTMLElement>) {
+  event.currentTarget.style.setProperty("--tilt-x", "0deg");
+  event.currentTarget.style.setProperty("--tilt-y", "0deg");
+}
 
 const SITE_ORIGIN = "https://prompt-shaped-webpage.lovable.app";
 const BANNER_URL = `${SITE_ORIGIN}${banner.url}`;
@@ -31,11 +43,6 @@ const STEPS = [
   { icon: Scale, title: "Registra", text: "Anota tu aporte en el programa EcoRegistro." },
   { icon: Sprout, title: "Transforma", text: "Tu material vuelve a ser recurso para el planeta." },
 ];
-const SUPPORT_CROPS = [
-  { label: "El gabinete", position: "center 6%" },
-  { label: "Ventilación", position: "center 42%" },
-  { label: "Prevención", position: "center 94%" },
-];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -55,13 +62,13 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const dialog = useRef<HTMLDialogElement>(null);
-  const [zoom, setZoom] = useState(1);
-  const support = useInView<HTMLDivElement>();
+  const [paused, setPaused] = useState(false);
+  const [viewerOpen, setViewerOpen] = useState(false);
 
   function openViewer() {
     const element = dialog.current;
     if (!element) return;
-    setZoom(1);
+    setViewerOpen(true);
     element.showModal();
     if (element.requestFullscreen) void element.requestFullscreen().catch(() => {});
   }
@@ -71,19 +78,19 @@ function Index() {
       try { await document.exitFullscreen(); } catch { /* The full-window dialog still closes. */ }
     }
     dialog.current?.close();
+    setViewerOpen(false);
   }
 
   return (
     <div className="min-h-screen bg-background font-sans text-foreground">
       <header className="sticky top-0 z-20 border-b border-border bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-6 sm:px-10">
-          <div className="relative flex size-14 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground" aria-hidden="true">
-            <Recycle className="size-10" strokeWidth={1.3} />
-            <Leaf className="absolute size-4 bg-primary" strokeWidth={1.7} />
+        <div className="mx-auto flex max-w-6xl items-center gap-3 px-6 py-4 sm:px-10">
+          <div className="brand-symbol relative flex size-11 shrink-0 items-center justify-center rounded-lg border border-primary/50 text-primary" aria-hidden="true">
+            <Recycle className="size-8" strokeWidth={1.3} />
           </div>
           <div>
-            <h1 className="text-3xl font-extrabold text-primary">EcoRegistro</h1>
-            <p className="mt-1 text-sm text-foreground">Soporte técnico y cuidado ambiental</p>
+            <h1 className="text-2xl font-extrabold text-foreground">EcoRegistro</h1>
+            <p className="mt-1 text-xs text-muted-foreground">Tecnología que cuida el planeta</p>
           </div>
         </div>
         <nav aria-label="Secciones" className="border-t border-border">
@@ -98,17 +105,22 @@ function Index() {
       <main>
         <section id="inicio" aria-label="Recolección de material reciclable" className="eco-banner scroll-section relative isolate overflow-hidden border-b border-border">
           <img src={BANNER_URL} width={1536} height={1024} alt="Ilustración de contenedores de recolección con botellas de plástico, papel, cartón, frascos de vidrio y latas de metal, y unas manos depositando una botella" className="banner-art" fetchPriority="high" />
-          <div className="relative mx-auto flex min-h-[21rem] max-w-6xl items-center px-6 py-10 sm:min-h-[27rem] sm:px-10">
-            <div className="max-w-md rounded-xl bg-card/95 p-6 backdrop-blur-[2px] sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
-              <p className="text-xs font-extrabold tracking-[0.18em] text-accent uppercase">Recolección de material reciclable</p>
-              <h2 className="mt-3 text-3xl leading-tight font-extrabold text-primary sm:text-4xl">Separamos hoy lo que mañana vuelve a servir</h2>
-              <p className="mt-4 text-base leading-relaxed">Plástico, papel, cartón, vidrio y metal: cada aporte que registras en EcoRegistro deja de ser basura y se convierte en recurso para el planeta.</p>
+          <div className="hero-inner relative mx-auto max-w-6xl px-6 sm:px-10">
+            <div className="hero-copy relative z-10">
+              <p className="text-xs font-extrabold text-accent uppercase">Recolección de material reciclable</p>
+              <h2 className="hero-title mt-3 font-extrabold text-foreground">EcoRegistro</h2>
+              <p className="mt-3 text-xl font-bold text-primary">Separamos hoy lo que mañana vuelve a servir.</p>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-foreground">Plástico, papel, cartón, vidrio y metal: cada aporte que registras en EcoRegistro deja de ser basura y se convierte en recurso para el planeta.</p>
               <ul className="mt-5 flex flex-wrap gap-2">
                 {MATERIALS.map((material) => (
                   <li key={material} className="rounded-full border border-border bg-background px-3 py-1 text-sm font-semibold text-primary">{material}</li>
                 ))}
               </ul>
             </div>
+            <ClientOnly fallback={<Recycle className="scene-fallback" aria-hidden="true" />}>
+              <Suspense fallback={<Recycle className="scene-fallback" aria-hidden="true" />}><EcoScene paused={paused} /></Suspense>
+            </ClientOnly>
+            <Button variant="outline" size="icon" className="motion-control" onClick={() => setPaused((value) => !value)} aria-label={paused ? "Reanudar animación 3D" : "Pausar animación 3D"} title={paused ? "Reanudar animación 3D" : "Pausar animación 3D"}>{paused ? <Play /> : <Pause />}</Button>
           </div>
         </section>
 
@@ -116,7 +128,7 @@ function Index() {
           <SectionHeading number="01" id="materiales-titulo" title="Materiales que recolectamos" />
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {MATERIAL_CARDS.map(({ name, icon: Icon, tip }, index) => (
-              <li key={name} className="material-card reveal" style={{ animationDelay: `${index * 90}ms` }}>
+              <li key={name} onPointerMove={tilt} onPointerLeave={resetTilt} className="material-card reveal" style={{ animationDelay: `${index * 90}ms` }}>
                 <span className="material-icon"><Icon className="size-7" strokeWidth={1.6} aria-hidden="true" /></span>
                 <h3 className="mt-4 text-lg font-extrabold text-primary">{name}</h3>
                 <p className="mt-2 text-sm leading-relaxed">{tip}</p>
@@ -141,31 +153,18 @@ function Index() {
           </div>
         </section>
 
-        <section id="infografia" aria-labelledby="infografia-titulo" className="scroll-section relative isolate overflow-hidden border-y border-border bg-card py-14">
-          <Leaf className="drift-leaf" strokeWidth={1.3} aria-hidden="true" />
-          <Recycle className="drift-recycle" strokeWidth={1.3} aria-hidden="true" />
-          <div className="relative mx-auto max-w-6xl px-6 sm:px-10">
-            <SectionHeading number="03" id="infografia-titulo" title="Guía de soporte técnico" />
-            <p className="mt-3 max-w-md text-sm leading-relaxed">Tres vistazos a la guía. Toca la tarjeta que quieras para abrirla completa y leerla con calma.</p>
-          </div>
-
-          <div ref={support.ref} className={cn("support-deck", support.inView && "is-visible")}>
-            <span className="deck-glow" aria-hidden="true" />
-            <button type="button" onClick={openViewer} className="deck-cards" aria-label="Abrir la guía de soporte técnico en pantalla completa">
-              <span className="sr-only">EcoRegistro soporte técnico: partes del gabinete y sus funciones, importancia de la ventilación, riesgos identificados y recomendaciones preventivas para cuidar tu computadora.</span>
-              {SUPPORT_CROPS.map((crop, index) => (
-                <span key={crop.label} className="deck-card" style={{ "--i": index, "--crop": crop.position } as CSSProperties}>
-                  <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="" loading="lazy" className="deck-img" />
-                  <span className="deck-shine" aria-hidden="true" />
-                  <span className="deck-tag">{crop.label}</span>
-                </span>
-              ))}
-            </button>
-          </div>
-
-          <div className="relative mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-3 px-6 pt-8 sm:px-10">
-            <Button onClick={openViewer} className="gap-2"><Maximize aria-hidden="true" />Abrir en pantalla completa</Button>
-            <span className="text-xs font-semibold text-muted-foreground">Dentro del visor puedes acercar con + y −</span>
+        <section id="infografia" aria-labelledby="infografia-titulo" className="scroll-section relative border-y border-border bg-card py-8">
+          <div className="support-layout mx-auto max-w-6xl px-6 sm:px-10">
+            <div>
+              <div className="mb-3 flex items-center gap-2 text-accent"><Cpu className="cpu-pulse size-5" aria-hidden="true" /><span className="text-xs font-bold">TECNOLOGÍA + MEDIO AMBIENTE</span></div>
+              <SectionHeading number="03" id="infografia-titulo" title="Soporte técnico" />
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">El gabinete, la ventilación y el mantenimiento preventivo: una computadora cuidada también reduce los residuos electrónicos.</p>
+              <Button onClick={openViewer} className="mt-5 gap-2"><Maximize aria-hidden="true" />Ver guía completa</Button>
+            </div>
+            <Button variant="ghost" onPointerMove={tilt} onPointerLeave={resetTilt} onClick={openViewer} className="support-preview" aria-label="Abrir la guía de soporte técnico en pantalla completa">
+              <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="Guía EcoRegistro: CPU, gabinete, ventilación y prevención" loading="lazy" />
+              <span className="preview-corner"><Maximize className="size-4" aria-hidden="true" /></span>
+            </Button>
           </div>
         </section>
 
@@ -190,27 +189,14 @@ function Index() {
           </div>
         </section>
 
-        <footer className="border-t border-accent/50 bg-primary px-6 py-10 text-center text-primary-foreground">
+        <footer className="border-t border-accent/50 bg-card px-6 py-8 text-center text-foreground">
           <p className="text-lg font-bold">“Pequeños hábitos, grandes cambios”</p>
           <p className="mt-1 text-sm opacity-90">EcoRegistro · Semillas del Cambio · 3.º BTI</p>
         </footer>
       </main>
 
       <dialog ref={dialog} aria-label="Infografía en pantalla completa" className="infographic-dialog" onCancel={(event) => { event.preventDefault(); void closeViewer(); }}>
-        <div className="flex h-full flex-col bg-background">
-          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border bg-card px-4 py-3">
-            <p className="hidden font-bold text-primary sm:block">EcoRegistro · Soporte técnico</p>
-            <div className="flex items-center gap-2">
-              <Button size="icon" variant="outline" title="Alejar" aria-label="Alejar" disabled={zoom <= 1} onClick={() => setZoom((value) => clampZoom(value - 0.5))}><Minus /></Button>
-              <output className="w-14 text-center text-sm font-bold" aria-live="polite">{Math.round(zoom * 100)}%</output>
-              <Button size="icon" variant="outline" title="Acercar" aria-label="Acercar" disabled={zoom >= 4} onClick={() => setZoom((value) => clampZoom(value + 0.5))}><Plus /></Button>
-              <Button size="icon" variant="outline" title="Cerrar" aria-label="Cerrar" onClick={() => void closeViewer()}><X /></Button>
-            </div>
-          </div>
-          <div className="min-h-0 flex-1 overflow-auto overscroll-contain">
-            <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="Infografía EcoRegistro ampliada" className="viewer-image" style={{ width: `${zoom * 100}%` }} />
-          </div>
-        </div>
+        {viewerOpen && <SupportImageViewer src={INFOGRAPHIC_URL} onClose={() => void closeViewer()} />}
       </dialog>
     </div>
   );
