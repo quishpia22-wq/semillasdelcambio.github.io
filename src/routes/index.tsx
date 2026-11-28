@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import infographic from "@/assets/guia-ecologica.png.asset.json";
 import banner from "@/assets/banner-recoleccion.png.asset.json";
 import { SupportImageViewer } from "@/components/support-image-viewer";
+import { ScrollReveal } from "@/components/scroll-reveal";
 import { DOWNLOAD_URL, LAUNCH_URL } from "@/lib/ecoregistro";
 
 const EcoScene = lazy(() => import("@/components/eco-scene"));
@@ -28,15 +29,16 @@ const NAV = [
   { href: "#inicio", label: "Inicio" },
   { href: "#materiales", label: "Materiales" },
   { href: "#pasos", label: "Cómo participar" },
+  { href: "#soporte", label: "Soporte técnico" },
   { href: "#infografia", label: "Infografía" },
   { href: "#descarga", label: "Descarga" },
 ];
 const MATERIAL_CARDS = [
-  { name: "Plástico", icon: Recycle, tip: "Botellas y envases limpios y aplastados." },
-  { name: "Papel", icon: FileText, tip: "Hojas, cuadernos y periódicos secos." },
-  { name: "Cartón", icon: Package, tip: "Cajas desarmadas y sin restos de comida." },
-  { name: "Vidrio", icon: GlassWater, tip: "Frascos y botellas enteros, sin tapa." },
-  { name: "Metal", icon: UtensilsCrossed, tip: "Latas enjuagadas y comprimidas." },
+  { name: "Plástico", icon: Recycle, tip: "Botellas y envases limpios y aplastados.", examples: "Botellas PET · Envases" },
+  { name: "Papel", icon: FileText, tip: "Hojas, cuadernos y periódicos secos.", examples: "Hojas · Periódicos" },
+  { name: "Cartón", icon: Package, tip: "Cajas desarmadas y sin restos de comida.", examples: "Cajas · Empaques" },
+  { name: "Vidrio", icon: GlassWater, tip: "Frascos y botellas enteros, sin tapa.", examples: "Frascos · Botellas" },
+  { name: "Metal", icon: UtensilsCrossed, tip: "Latas enjuagadas y comprimidas.", examples: "Latas · Envases metálicos" },
 ];
 const STEPS = [
   { icon: Trash2, title: "Separa", text: "Clasifica tus residuos por tipo de material." },
@@ -109,67 +111,95 @@ function Index() {
             <div className="hero-copy relative z-10">
               <p className="text-xs font-extrabold text-accent uppercase">Recolección de material reciclable</p>
               <h2 className="hero-title mt-3 font-extrabold text-foreground">EcoRegistro</h2>
-              <p className="mt-3 text-xl font-bold text-primary">Separamos hoy lo que mañana vuelve a servir.</p>
+              <p className="mt-3 text-xl font-bold text-primary">Separar hoy para construir un mañana sostenible</p>
+              <p className="mt-3 text-sm font-semibold text-accent">Separamos hoy lo que mañana vuelve a servir.</p>
               <p className="mt-4 max-w-md text-sm leading-relaxed text-foreground">Plástico, papel, cartón, vidrio y metal: cada aporte que registras en EcoRegistro deja de ser basura y se convierte en recurso para el planeta.</p>
               <ul className="mt-5 flex flex-wrap gap-2">
                 {MATERIALS.map((material) => (
                   <li key={material} className="rounded-full border border-border bg-background px-3 py-1 text-sm font-semibold text-primary">{material}</li>
                 ))}
               </ul>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Button asChild><a href="#materiales"><Recycle />Materiales</a></Button>
+                <Button asChild variant="outline"><a href="#descarga"><Download />Descargar EcoRegistro</a></Button>
+              </div>
             </div>
             <ClientOnly fallback={<Recycle className="scene-fallback" aria-hidden="true" />}>
               <Suspense fallback={<Recycle className="scene-fallback" aria-hidden="true" />}><EcoScene paused={paused} /></Suspense>
             </ClientOnly>
             <Button variant="outline" size="icon" className="motion-control" onClick={() => setPaused((value) => !value)} aria-label={paused ? "Reanudar animación 3D" : "Pausar animación 3D"} title={paused ? "Reanudar animación 3D" : "Pausar animación 3D"}>{paused ? <Play /> : <Pause />}</Button>
+            <Leaf className="floating-leaf leaf-one" aria-hidden="true" /><Leaf className="floating-leaf leaf-two" aria-hidden="true" />
           </div>
         </section>
 
-        <section id="materiales" aria-labelledby="materiales-titulo" className="scroll-section mx-auto max-w-6xl px-6 py-16 sm:px-10">
+        <section id="materiales" aria-labelledby="materiales-titulo" className="scroll-section mx-auto max-w-6xl px-6 py-8 sm:px-10">
+          <ScrollReveal>
           <SectionHeading number="01" id="materiales-titulo" title="Materiales que recolectamos" />
+          <p className="mt-4 text-sm text-muted-foreground">Cinco materiales, una nueva oportunidad. Separarlos es el primer paso.</p>
           <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-            {MATERIAL_CARDS.map(({ name, icon: Icon, tip }, index) => (
+            {MATERIAL_CARDS.map(({ name, icon: Icon, tip, examples }, index) => (
               <li key={name} onPointerMove={tilt} onPointerLeave={resetTilt} className="material-card reveal" style={{ animationDelay: `${index * 90}ms` }}>
                 <span className="material-icon"><Icon className="size-7" strokeWidth={1.6} aria-hidden="true" /></span>
                 <h3 className="mt-4 text-lg font-extrabold text-primary">{name}</h3>
                 <p className="mt-2 text-sm leading-relaxed">{tip}</p>
+                <p className="mt-4 border-t border-border pt-3 text-xs text-accent">{examples}</p>
               </li>
             ))}
           </ul>
+          </ScrollReveal>
         </section>
 
         <section id="pasos" aria-labelledby="pasos-titulo" className="scroll-section bg-card py-16">
           <div className="mx-auto max-w-6xl px-6 sm:px-10">
+            <ScrollReveal>
             <SectionHeading number="02" id="pasos-titulo" title="Cómo participar" />
-            <ol className="mt-10 grid gap-6 md:grid-cols-3">
+            <p className="mt-4 text-sm text-muted-foreground">Cada aporte cuenta: separa, registra y transforma.</p>
+            <ol className="steps-grid mt-10 grid gap-6 md:grid-cols-3">
               {STEPS.map(({ icon: Icon, title, text }, index) => (
                 <li key={title} className="step-card reveal" style={{ animationDelay: `${index * 120}ms` }}>
-                  <span className="step-number">{index + 1}</span>
+                  <span className="step-number">0{index + 1}</span>
                   <Icon className="size-8 text-accent" strokeWidth={1.6} aria-hidden="true" />
                   <h3 className="mt-3 text-xl font-extrabold text-primary">{title}</h3>
                   <p className="mt-2 leading-relaxed">{text}</p>
                 </li>
               ))}
             </ol>
+            </ScrollReveal>
           </div>
         </section>
 
-        <section id="infografia" aria-labelledby="infografia-titulo" className="scroll-section relative border-y border-border bg-card py-8">
+        <section id="soporte" aria-labelledby="soporte-titulo" className="scroll-section relative border-y border-border bg-background py-8">
           <div className="support-layout mx-auto max-w-6xl px-6 sm:px-10">
             <div>
               <div className="mb-3 flex items-center gap-2 text-accent"><Cpu className="cpu-pulse size-5" aria-hidden="true" /><span className="text-xs font-bold">TECNOLOGÍA + MEDIO AMBIENTE</span></div>
-              <SectionHeading number="03" id="infografia-titulo" title="Soporte técnico" />
+              <SectionHeading number="03" id="soporte-titulo" title="Soporte técnico" />
               <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">El gabinete, la ventilación y el mantenimiento preventivo: una computadora cuidada también reduce los residuos electrónicos.</p>
               <Button onClick={openViewer} className="mt-5 gap-2"><Maximize aria-hidden="true" />Ver guía completa</Button>
             </div>
-            <Button variant="ghost" onPointerMove={tilt} onPointerLeave={resetTilt} onClick={openViewer} className="support-preview" aria-label="Abrir la guía de soporte técnico en pantalla completa">
-              <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="Guía EcoRegistro: CPU, gabinete, ventilación y prevención" loading="lazy" />
+            <Button variant="ghost" onPointerMove={tilt} onPointerLeave={resetTilt} onClick={openViewer} className="support-preview cpu-preview" aria-label="Ampliar imagen del CPU y soporte técnico">
+              <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="Guía EcoRegistro: CPU, gabinete, ventilación y prevención" />
               <span className="preview-corner"><Maximize className="size-4" aria-hidden="true" /></span>
             </Button>
           </div>
         </section>
 
+        <section id="infografia" aria-labelledby="infografia-titulo" className="scroll-section bg-card py-12">
+          <div className="mx-auto max-w-6xl px-6 sm:px-10">
+            <ScrollReveal>
+              <SectionHeading number="04" id="infografia-titulo" title="Infografía EcoRegistro" />
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">Identificación, cuidado y prevención de riesgos en el gabinete de computadora: partes y funciones, ventilación, riesgos y recomendaciones preventivas.</p>
+              <div className="mt-7 flex flex-col items-center gap-5">
+                <Button variant="ghost" onClick={openViewer} className="infographic-preview" aria-label="Abrir la guía de soporte técnico en pantalla completa">
+                  <img src={INFOGRAPHIC_URL} width={1024} height={1536} alt="Infografía original EcoRegistro de soporte técnico" loading="lazy" />
+                </Button>
+                <Button variant="outline" onClick={openViewer}><Maximize />Ampliar infografía</Button>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
         <section id="descarga" aria-label="Acceso a EcoRegistro en Visual Basic" className="scroll-section eco-access px-6 py-14 text-center sm:py-16">
-          <p className="mb-2 text-sm font-extrabold tracking-[0.2em] text-accent">04</p>
+          <p className="mb-2 text-sm font-extrabold text-accent">05</p>
           <h2 className="mb-6 text-3xl font-extrabold text-primary">Descarga EcoRegistro</h2>
           <Leaf className="mx-auto mb-6 size-9 text-primary" strokeWidth={1.3} aria-hidden="true" />
           <p className="mx-auto mb-7 max-w-xl text-base leading-relaxed">¿Listo para registrar tus aportes de material reciclable? Descarga el programa EcoRegistro para Windows, extrae el archivo ZIP y abre EcoRegistro.exe.</p>
@@ -190,8 +220,12 @@ function Index() {
         </section>
 
         <footer className="border-t border-accent/50 bg-card px-6 py-8 text-center text-foreground">
+          <div className="mb-3 flex items-center justify-center gap-2 text-primary"><Recycle className="size-6" /><span className="text-xl font-extrabold">EcoRegistro</span></div>
+          <p className="mx-auto mb-5 max-w-lg text-sm text-muted-foreground">Recolección de material reciclable, soporte técnico y cuidado ambiental.</p>
+          <nav aria-label="Navegación del pie de página" className="mb-6 flex flex-wrap justify-center gap-x-5 gap-y-3 text-sm">{NAV.map((item) => <a key={item.href} href={item.href} className="text-accent transition-colors hover:text-primary">{item.label}</a>)}</nav>
           <p className="text-lg font-bold">“Pequeños hábitos, grandes cambios”</p>
           <p className="mt-1 text-sm opacity-90">EcoRegistro · Semillas del Cambio · 3.º BTI</p>
+          <p className="mt-4 text-xs text-muted-foreground">© EcoRegistro. Todos los derechos reservados.</p>
         </footer>
       </main>
 

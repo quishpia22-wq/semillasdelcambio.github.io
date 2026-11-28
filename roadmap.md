@@ -6,7 +6,9 @@
 - [x] Mover el botón de acceso debajo de la infografía.
 
 # Animación tecnológica y ecológica
-- [ ] Añadir una escena 3D de reciclaje y animaciones con movimiento reducido.
-- [ ] Aplicar colores tecnológicos y bordes de letras verde neón.
-- [ ] Reducir soporte técnico y permitir ampliar y mover su imagen.
-- [ ] Verificar escritorio, móvil y controles del visor.
+- [x] Añadir una escena 3D de reciclaje y animaciones con movimiento reducido.
+- [x] Aplicar colores tecnológicos y bordes de letras verde neón.
+- [x] Reducir soporte técnico y permitir ampliar y mover su imagen.
+- [x] Verificar escritorio, móvil y controles del visor.
+- [x] Incorporar el archivo de rediseño completo sin eliminar contenido, imágenes, enlaces ni funciones.
+- [x] Separar Soporte técnico e Infografía; completar materiales, navegación y pie de página.

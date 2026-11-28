@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 export function SupportImageViewer({ src, onClose }: { src: string; onClose: () => void }) {
   const [scale, setScale] = useState(1);
   return (
-    <TransformWrapper minScale={1} maxScale={4} initialScale={1} centerOnInit onTransformed={(_, state) => setScale(state.scale)} wheel={{ step: 0.08 }}>
+    <TransformWrapper minScale={1} maxScale={4} initialScale={1} centerOnInit onTransform={(_, state) => setScale(state.scale)} wheel={{ step: 0.08 }}>
       {({ zoomIn, zoomOut, resetTransform }) => (
         <div className="flex h-full flex-col bg-background">
           <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border bg-card px-3 py-3 sm:px-5">
